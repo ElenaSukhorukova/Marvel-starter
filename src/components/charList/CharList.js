@@ -1,52 +1,92 @@
-import './charList.scss';
-import abyss from '../../resources/img/abyss.jpg';
+import {Component} from 'react';
 
-const CharList = () => {
+import MarvelService from '../../services/MarvelService';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
+
+import './charList.scss';
+
+class CharList extends Component {
+    state = {
+        chars: null,
+        loading: true,
+        error: false
+    }
+
+    marvelService = new MarvelService();
+
+    componentDidMount() {
+        this.getChars();
+    }
+
+    onError = () => {
+        this.setState({
+            loading: false,
+            error: true
+        })
+    }
+
+    onCharLoaded = (chars) => {
+        console.log(chars)
+        this.setState({
+            chars,
+            loading: false
+        })
+    }
+
+    getChars = () => {
+        this.marvelService
+            .getAllCharacters()
+            .then(this.onCharLoaded)
+            .catch(this.onError);
+    }
+
+   render () {
+        const {chars, loading, error} = this.state;
+        const errorMessage = error ? <ErrorMessage /> : null;
+        const spinner = loading ? <Spinner /> : null;
+        let content
+
+        console.log('error, loading', error, loading)
+
+        if (!(loading || error)) {
+            debugger;
+            content = chars.map(char => {
+                return <View char={char} key={char.id} />;
+            })
+        } else {
+            content = null
+        }
+
+
+        console.log(chars)
+
+        return (
+            <div className="char__list">
+                <ul className="char__grid">
+                    {errorMessage}
+                    {spinner}
+                    {content}
+                </ul>
+                <button className="button button__main button__long">
+                    <div className="inner">load more</div>
+                </button>
+            </div>
+        );
+   }
+}
+
+const View = (props) => {
+    const {name, thumbnail} = props.char
+
+    const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
+
     return (
-        <div className="char__list">
-            <ul className="char__grid">
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item char__item_selected">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-                <li className="char__item">
-                    <img src={abyss} alt="abyss"/>
-                    <div className="char__name">Abyss</div>
-                </li>
-            </ul>
-            <button className="button button__main button__long">
-                <div className="inner">load more</div>
-            </button>
-        </div>
-    )
+        <li className="char__item">
+            <img src={thumbnail} alt="abyss" style={imgStyle} />
+            <div className="char__name">{name}</div>
+        </li>
+    );
 }
 
 export default CharList;
