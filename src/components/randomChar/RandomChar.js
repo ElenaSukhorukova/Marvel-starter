@@ -1,7 +1,7 @@
-import {Component} from 'react';
+import { Component } from 'react';
 
-import Spinner from '../spinner/Spinner';
 import MarvelService from '../../services/MarvelService';
+import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './randomChar.scss';
@@ -32,6 +32,12 @@ class RandomChar extends Component {
         })
     }
 
+    onCharLoading = () => {
+        this.setState({
+            loading: true
+        })
+    }
+
     onError = () => {
         this.setState({
             loading: false,
@@ -41,6 +47,7 @@ class RandomChar extends Component {
 
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+        this.onCharLoading();
 
         this.marvelService
             .getCharacter(id)
@@ -88,6 +95,7 @@ class RandomChar extends Component {
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
+
 
     return (
         <div className="randomchar__block">

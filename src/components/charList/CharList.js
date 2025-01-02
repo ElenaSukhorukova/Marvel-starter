@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import { Component } from 'react';
 
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -8,7 +8,7 @@ import './charList.scss';
 
 class CharList extends Component {
     state = {
-        chars: null,
+        chars: [],
         loading: true,
         error: false
     }
@@ -27,7 +27,6 @@ class CharList extends Component {
     }
 
     onCharLoaded = (chars) => {
-        console.log(chars)
         this.setState({
             chars,
             loading: false
@@ -47,19 +46,15 @@ class CharList extends Component {
         const spinner = loading ? <Spinner /> : null;
         let content
 
-        console.log('error, loading', error, loading)
-
         if (!(loading || error)) {
-            debugger;
             content = chars.map(char => {
-                return <View char={char} key={char.id} />;
+                return <View char={char}
+                             key={char.id}
+                             onCharSelected={() => this.props.onCharSelected(char.id)} />;
             })
         } else {
             content = null
         }
-
-
-        console.log(chars)
 
         return (
             <div className="char__list">
@@ -78,12 +73,12 @@ class CharList extends Component {
 
 const View = (props) => {
     const {name, thumbnail} = props.char
-
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
 
     return (
-        <li className="char__item">
-            <img src={thumbnail} alt="abyss" style={imgStyle} />
+        <li className="char__item"
+            onClick={props.onCharSelected}>
+            <img src={thumbnail} alt={name} style={imgStyle} />
             <div className="char__name">{name}</div>
         </li>
     );
