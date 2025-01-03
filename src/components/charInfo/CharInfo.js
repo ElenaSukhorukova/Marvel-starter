@@ -67,8 +67,6 @@ class CharInfo extends Component {
         const errorMessage = error ? <ErrorMessage /> : null;
         const spinner = loading ? <Spinner /> : null;
 
-        console.log(char);
-
         const content = !(loading || error || !char) ? <View char={char} /> : null;
 
         return (
