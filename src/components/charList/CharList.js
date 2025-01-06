@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, Children, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 
 import MarvelService from '../../services/MarvelService';
@@ -14,7 +14,8 @@ class CharList extends Component {
         error: false,
         newItemLoading: false,
         offset: 210,
-        charEnded: false
+        charEnded: false,
+        selectedChar: null
     }
 
     marvelService = new MarvelService();
@@ -55,29 +56,38 @@ class CharList extends Component {
          }))
     }
 
+    onSelect = (charId) => {
+        this.props.onCharSelected(charId)
+
+        this.setState({selectedChar: charId})
+    }
+
    render () {
-        const {chars, loading, error, newItemLoading, offset, charEnded} = this.state;
+        const {chars, loading, error, newItemLoading, offset, charEnded, selectedChar} = this.state;
         const errorMessage = error ? <ErrorMessage /> : null;
         const spinner = loading ? <Spinner /> : null;
-        let content
+        let content;
 
         if (!(loading || error)) {
             content = chars.map(char => {
-                return <View char={char}
-                             key={char.id}
-                             onCharSelected={() => this.props.onCharSelected(char.id)} />;
-            })
+                return (
+                    <View char={char}
+                        key={char.id}
+                        className={"char__item"}
+                        onCharSelected={() => this.onSelect(char.id)} />
+                );
+            });
         } else {
             content = null
         }
 
         return (
             <div className="char__list">
-                <ul className="char__grid">
+                <UlWrapper selectedChar={selectedChar}>
                     {errorMessage}
                     {spinner}
                     {content}
-                </ul>
+                </UlWrapper>
                 <button className="button button__main button__long"
                         disabled={newItemLoading}
                         style={{'display': charEnded ? 'none' : 'block'}}
@@ -94,12 +104,34 @@ const View = (props) => {
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
 
     return (
-        <li className="char__item"
-            onClick={props.onCharSelected}>
+        <li className={props.className}
+            onClick={props.onCharSelected}
+            tabindex="0">
             <img src={thumbnail} alt={name} style={imgStyle} />
             <div className="char__name">{name}</div>
         </li>
     );
+}
+
+class UlWrapper extends Component {
+    render() {
+        const {children, selectedChar} = this.props
+        return (
+            <ul className="char__grid">
+                {
+                    Children.map(children, child => {
+                        console.log(child);
+
+                        if (child && (child.key && Number(child.key) === selectedChar)) {
+                            return cloneElement(child, {className: `${child.props.className} char__item_selected` })
+                        }
+
+                        return child;
+                    })
+                }
+            </ul>
+        )
+    }
 }
 
 CharList.propTypes = {
