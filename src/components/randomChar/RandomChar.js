@@ -28,13 +28,15 @@ class RandomChar extends Component {
     onCharLoaded = (char) => {
         this.setState({
             char,
-            loading: false
+            loading: false,
+            error: false
         })
     }
 
     onCharLoading = () => {
         this.setState({
-            loading: true
+            loading: true,
+            error: false
         })
     }
 

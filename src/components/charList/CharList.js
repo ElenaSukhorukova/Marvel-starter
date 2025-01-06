@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -12,13 +13,13 @@ class CharList extends Component {
         loading: true,
         error: false,
         newItemLoading: false,
-        offset: 210
+        offset: 210,
+        charEnded: false
     }
 
     marvelService = new MarvelService();
 
     componentDidMount() {
-        console.log('componentDidMount')
         this.onRequest();
     }
 
@@ -45,18 +46,17 @@ class CharList extends Component {
     }
 
     onCharLoaded = (newChars) => {
-        console.log('onCharLoaded', newChars, this.state.chars)
-
         this.setState(({offset, chars}) => ({
             chars: [...chars, ...newChars],
             loading: false,
             newItemLoading: false,
-            offset: offset + 9
+            offset: offset + 9,
+            charEnded: newChars.length < 9 ? true : false
          }))
     }
 
    render () {
-        const {chars, loading, error, newItemLoading, offset} = this.state;
+        const {chars, loading, error, newItemLoading, offset, charEnded} = this.state;
         const errorMessage = error ? <ErrorMessage /> : null;
         const spinner = loading ? <Spinner /> : null;
         let content
@@ -80,6 +80,7 @@ class CharList extends Component {
                 </ul>
                 <button className="button button__main button__long"
                         disabled={newItemLoading}
+                        style={{'display': charEnded ? 'none' : 'block'}}
                         onClick={() => this.onRequest(offset)}>
                     <div className="inner">load more</div>
                 </button>
@@ -99,6 +100,10 @@ const View = (props) => {
             <div className="char__name">{name}</div>
         </li>
     );
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
