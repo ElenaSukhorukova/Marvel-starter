@@ -62,6 +62,12 @@ class CharList extends Component {
         this.setState({selectedChar: charId})
     }
 
+    onKeyDown = (e, charId) => {
+        if (e.keyCode === 13) {
+            this.onSelect(charId)
+        }
+    }
+
    render () {
         const {chars, loading, error, newItemLoading, offset, charEnded, selectedChar} = this.state;
         const errorMessage = error ? <ErrorMessage /> : null;
@@ -74,7 +80,8 @@ class CharList extends Component {
                     <View char={char}
                         key={char.id}
                         className={"char__item"}
-                        onCharSelected={() => this.onSelect(char.id)} />
+                        onCharSelected={() => this.onSelect(char.id)}
+                        onKeyDown={(e) => this.onKeyDown(e, char.id)}/>
                 );
             });
         } else {
@@ -101,12 +108,14 @@ class CharList extends Component {
 
 const View = (props) => {
     const {name, thumbnail} = props.char
+    const {className, onCharSelected, onKeyDown} = props;
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
 
     return (
-        <li className={props.className}
-            onClick={props.onCharSelected}
-            tabindex="0">
+        <li className={className}
+            onClick={onCharSelected}
+            tabIndex="0"
+            onKeyDown={onKeyDown}>
             <img src={thumbnail} alt={name} style={imgStyle} />
             <div className="char__name">{name}</div>
         </li>
@@ -120,8 +129,6 @@ class UlWrapper extends Component {
             <ul className="char__grid">
                 {
                     Children.map(children, child => {
-                        console.log(child);
-
                         if (child && (child.key && Number(child.key) === selectedChar)) {
                             return cloneElement(child, {className: `${child.props.className} char__item_selected` })
                         }
