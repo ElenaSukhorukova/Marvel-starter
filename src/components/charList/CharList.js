@@ -15,19 +15,15 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
-   const marvelService = new MarvelService();
-
     useEffect(() => {
-        onRequest();
-    }, []);
+        const marvelService = new MarvelService();
 
-    const onRequest = (offset) => {
         onCharLoading();
 
         marvelService.getAllCharacters(offset)
                      .then(onCharLoaded)
                      .catch(onError);
-    }
+    }, [offset]);
 
     const onCharLoading = () => {
         setNewItemLoading(true);
@@ -42,7 +38,6 @@ const CharList = (props) => {
         setChars(chars => [...chars, ...newChars]);
         setLoading(false);
         setNewItemLoading(false);
-        setOffset(offset => offset + 9)
         setCharEnded(newChars.length < 9 ? true : false)
     }
 
@@ -100,7 +95,7 @@ const CharList = (props) => {
             <button className="button button__main button__long"
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}
-                    onClick={() => onRequest(offset)}>
+                    onClick={() => setOffset(offset => offset + 9)}>
                 <div className="inner">load more</div>
             </button>
         </div>
