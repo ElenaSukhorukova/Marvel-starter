@@ -1,42 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './charList.scss';
 
 const CharList = (props) => {
+    const {loading, error, getAllCharacters} = useMarvelService();
     const [chars, setChars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(false);
+    const [initial, setInitial] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
     useEffect(() => {
-        const marvelService = new MarvelService();
+        setNewItemLoading(initial ? false : true);
 
-        onCharLoading();
-
-        marvelService.getAllCharacters(offset)
-                     .then(onCharLoaded)
-                     .catch(onError);
-    }, [offset]);
-
-    const onCharLoading = () => {
-        setNewItemLoading(true);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
+        getAllCharacters(offset).then(onCharLoaded);
+    }, [offset, initial]);
 
     const onCharLoaded = (newChars) => {
         setChars(chars => [...chars, ...newChars]);
-        setLoading(false);
         setNewItemLoading(false);
         setCharEnded(newChars.length < 9 ? true : false)
     }

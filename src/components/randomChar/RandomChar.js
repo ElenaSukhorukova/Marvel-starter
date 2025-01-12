@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -9,48 +9,27 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const {loading, error, getCharacter} = useMarvelService();
 
-    const id = useMemo(() => {
-        if (loading) return Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    }, [loading])
+    const autoUpdate = () => updateChar();
 
     useEffect(() => {
-        if (!id) return;
+        updateChar();
+    }, []);
 
-        const marvelService = new MarvelService();
+    const updateChar = () => {
+        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
-        marvelService
-            .getCharacter(id)
-            .then(onCharLoaded)
-            .catch(onError);
-    }, [id])
-
-    useEffect(() => {
-        if (loading) return;
-
-        const timerId = setInterval(() => {
-            setLoading(true)
-        }, 6000);
-
-        return () => clearInterval(timerId);
-    }, [loading])
+        getCharacter(id).then(onCharLoaded);
+    }
 
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
-        setError(false);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true);
     }
 
     const errorMessage = error ? <ErrorMessage /> : null;
     const spinner = loading ? <Spinner /> : null;
-    const content = !(loading || error) ? <View char={char} /> : null;
+    const content = !(loading || error) && char ? <View char={char} autoUpdate={autoUpdate} /> : null;
 
     return (
         <div className="randomchar">
@@ -66,7 +45,7 @@ const RandomChar = () => {
                     Or choose another one
                 </p>
 
-                <button onClick={() => setLoading(true)} className="button button__main">
+                <button onClick={updateChar} className="button button__main">
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
@@ -75,10 +54,15 @@ const RandomChar = () => {
     )
 }
 
-const View = ({char}) => {
+const View = ({char, autoUpdate}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
 
+    useEffect(() => {
+        const timeOut = setTimeout(autoUpdate, 25000);
+
+        return () => clearTimeout(timeOut)
+    }, []);
 
     return (
         <div className="randomchar__block">
