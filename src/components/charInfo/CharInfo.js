@@ -13,13 +13,16 @@ const CharInfo = ( {charId} ) => {
     const {loading, error, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
+        updateChar();
+    }, [charId]);
+
+    const updateChar = () => {
         if (!charId) return;
 
         clearError();
 
         getCharacter(charId).then(onCharLoaded)
-    }, [charId]);
-
+    }
     const onCharLoaded = (char) => {
         setChar(char);
     }
