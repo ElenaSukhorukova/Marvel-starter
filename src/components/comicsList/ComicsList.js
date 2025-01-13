@@ -15,11 +15,11 @@ const ComicsList = () => {
     const [comicsEnded, setComicsEnded] = useState(false);
 
     useEffect(() => {
-        onRequest(offset);
+        onRequest(offset, true);
     }, [])
 
-    const onRequest = (offset) => {
-        setNewLoading(true);
+    const onRequest = (offset, initial) => {
+        setNewLoading(initial ? false : true);
         getAllComics(offset).then(loadedComics);
     }
 
