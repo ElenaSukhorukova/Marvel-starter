@@ -11,19 +11,23 @@ const CharList = (props) => {
     const {loading, error, getAllCharacters} = useMarvelService();
     const [chars, setChars] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
-    const [initial, setInitial] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
     useEffect(() => {
+        onRequest(offset, true);
+    }, []);
+
+    const onRequest = (offset, initial) => {
         setNewItemLoading(initial ? false : true);
 
         getAllCharacters(offset).then(onCharLoaded);
-    }, [offset, initial]);
+    }
 
     const onCharLoaded = (newChars) => {
         setChars(chars => [...chars, ...newChars]);
         setNewItemLoading(false);
+        setOffset(offset => offset + 9)
         setCharEnded(newChars.length < 9 ? true : false)
     }
 
@@ -70,18 +74,17 @@ const CharList = (props) => {
 
     const items = renderItems(chars);
     const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    let content = !(loading || error) ? items : null
+    const spinner = loading && !newItemLoading ? <Spinner /> : null;
 
     return (
         <div className="char__list">
             {errorMessage}
             {spinner}
-            {content}
+            {items}
             <button className="button button__main button__long"
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}
-                    onClick={() => setOffset(offset => offset + 9)}>
+                    onClick={() => onRequest(offset)}>
                 <div className="inner">load more</div>
             </button>
         </div>
