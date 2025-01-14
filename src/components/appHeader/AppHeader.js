@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router';
 
 import './appHeader.scss';
 
@@ -13,21 +13,21 @@ const AppHeader = () => {
             <nav className="app__menu">
                 <ul>
                     <li><NavLink
-                            exact
+                            end
                             to="/"
-                            activeStyle={{
-                                color: "#9F0013"
-                              }}>
+                            style={({ isActive }) => ({
+                                color: isActive ? "#9F0013" : "inherit",
+                            })}>
 
                             Characters
                     </NavLink></li>
                     /
                     <li><NavLink
-                            exact
+                            end
                             to="/comics"
-                            activeStyle={{
-                                color: "#9F0013"
-                              }}>
+                            style={({ isActive }) => ({
+                                color: isActive ? "#9F0013" : "inherit",
+                            })}>
 
                             Comics
                         </NavLink></li>
