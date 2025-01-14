@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -32,14 +33,16 @@ const ComicsList = () => {
     }
 
     function renderComics(comics) {
-        const items = comics.map(item => {
+        const items = comics.map((item, i) => {
+            const imgStyle = item.thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
+
             return (
-                <li key={item.id} className="comics__item">
-                    <a href={item.url}>
-                        <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
+                <li key={i} className="comics__item">
+                    <Link to={`/comics/${item.id}`}>
+                        <img src={item.thumbnail} alt={item.title} className="comics__item-img" style={imgStyle}/>
                         <div className="comics__item-name">{item.title}</div>
                         <div className="comics__item-price">{item.price}</div>
-                    </a>
+                    </Link>
                 </li>
             )
         })
