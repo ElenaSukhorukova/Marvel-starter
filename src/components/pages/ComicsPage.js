@@ -6,10 +6,10 @@ import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 const ComicsPage = () => {
     return (
         <>
-        <AppBanner />
-                <ErrorBoundary>
-                    <ComicsList />
-                </ErrorBoundary>
+            <AppBanner />
+            <ErrorBoundary>
+                <ComicsList />
+            </ErrorBoundary>
         </>
     );
 }
