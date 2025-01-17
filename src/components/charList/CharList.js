@@ -15,19 +15,25 @@ const CharList = (props) => {
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
+    const [duration, setDuraction] = useState(300);
 
     useEffect(() => {
         onRequest(offset, true);
     }, []);
 
     const onRequest = (offset, initial) => {
-        setNewItemLoading(initial ? false : true);
+        if (initial) {
+            setNewItemLoading(false);
+        } else {
+            setNewItemLoading(true);
+            setDuraction(300);
+        }
 
         getAllCharacters(offset).then(onCharLoaded);
     }
 
     const onCharLoaded = async (newChars) => {
-        newChars = newChars.map(char => ({...char, nodeRef: createRef(null)}))
+        newChars = newChars.map(char => ({...char, nodeRef: createRef(null), duration: setDuraction(duration => duration + 100)}))
 
         setChars(chars => [...chars, ...newChars]);
         setNewItemLoading(false);
@@ -44,47 +50,41 @@ const CharList = (props) => {
     }
 
     function renderItems(arr) {
-        let duration = 0;
-
-        const items = arr.map((item, i) => {
-            const imgStyle = item.thumbnail.includes("image_not_available") ? {'objectFit': 'fill'} : null
-
-            duration = duration === 0 ? 300 : duration + 100
-
-            return (
-                <CSSTransition
-                    key={item.id}
-                    timeout={duration}
-                    nodeRef={item.nodeRef}
-                    classNames="item">
-                    <li
-                        className="char__item"
-                        tabIndex={0}
-                        key={item.id}
-                        ref={item.nodeRef}
-                        onClick={(e) => {
-                            props.onCharSelected(item.id);
-                            focusOnItem(item.nodeRef);
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === " " || e.key === "Enter") {
-                                props.onCharSelected(item.id);
-                                focusOnItem(item.nodeRef);
-                            }
-                        }}>
-
-                        <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-                        <div className="char__name">{item.name}</div>
-                    </li>
-                </CSSTransition>
-            );
-        });
-
         return (
-            <ul className="char__grid">
-                <TransitionGroup
-                    className="char__grid">
-                    {items}
+            <ul>
+                <TransitionGroup className="char__grid">
+                    {arr.map((item) => {
+                        const imgStyle = item.thumbnail.includes("image_not_available") ? {'objectFit': 'fill'} : null
+
+                        return (
+                            <CSSTransition
+                                key={item.id}
+                                timeout={item.duration}
+                                nodeRef={item.nodeRef}
+                                classNames="item">
+
+                                <li
+                                    className="char__item"
+                                    tabIndex={0}
+                                    key={item.id}
+                                    ref={item.nodeRef}
+                                    onClick={() => {
+                                        props.onCharSelected(item.id);
+                                        focusOnItem(item.nodeRef);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === " " || e.key === "Enter") {
+                                            props.onCharSelected(item.id);
+                                            focusOnItem(item.nodeRef);
+                                        }
+                                    }}>
+
+                                    <img src={item.thumbnail} alt={item.name} style={imgStyle} />
+                                    <div className="char__name">{item.name}</div>
+                                </li>
+                            </CSSTransition>
+                        )
+                    })}
                 </TransitionGroup>
             </ul>
         )
