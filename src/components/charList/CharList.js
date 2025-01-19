@@ -1,7 +1,6 @@
 import { useState, useEffect, createRef } from 'react';
 import PropTypes from 'prop-types';
-
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { motion } from "motion/react";
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -15,26 +14,25 @@ const CharList = (props) => {
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
-    const [duration, setDuraction] = useState(300);
 
     useEffect(() => {
         onRequest(offset, true);
     }, []);
 
     const onRequest = (offset, initial) => {
-        if (initial) {
-            setNewItemLoading(false);
-        } else {
-            setNewItemLoading(true);
-            setDuraction(300);
-        }
+        setNewItemLoading(initial ? false : true);
 
         getAllCharacters(offset).then(onCharLoaded);
     }
 
     const onCharLoaded = async (newChars) => {
-        newChars = newChars.map(char => ({...char, nodeRef: createRef(null), duration: setDuraction(duration => duration + 100)}))
+        let duration = 0
+        newChars = newChars.map(char => {
+            duration += 1
+            return {...char, nodeRef: createRef(null), duration: duration}
+        })
 
+        console.log(newChars)
         setChars(chars => [...chars, ...newChars]);
         setNewItemLoading(false);
         setOffset(offset => offset + 9)
@@ -51,41 +49,35 @@ const CharList = (props) => {
 
     function renderItems(arr) {
         return (
-            <ul>
-                <TransitionGroup className="char__grid">
-                    {arr.map((item) => {
-                        const imgStyle = item.thumbnail.includes("image_not_available") ? {'objectFit': 'fill'} : null
+            <ul className="char__grid">
+                {arr.map((item) => {
+                    const imgStyle = item.thumbnail.includes("image_not_available") ? {'objectFit': 'fill'} : null
 
-                        return (
-                            <CSSTransition
-                                key={item.id}
-                                timeout={item.duration}
-                                nodeRef={item.nodeRef}
-                                classNames="item">
+                    return (
+                        <motion.li
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            transition={{duration: item.duration}}
+                            className="char__item"
+                            tabIndex={0}
+                            key={item.id}
+                            ref={item.nodeRef}
+                            onClick={() => {
+                                props.onCharSelected(item.id);
+                                focusOnItem(item.nodeRef);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === " " || e.key === "Enter") {
+                                    props.onCharSelected(item.id);
+                                    focusOnItem(item.nodeRef);
+                                }
+                            }}>
 
-                                <li
-                                    className="char__item"
-                                    tabIndex={0}
-                                    key={item.id}
-                                    ref={item.nodeRef}
-                                    onClick={() => {
-                                        props.onCharSelected(item.id);
-                                        focusOnItem(item.nodeRef);
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === " " || e.key === "Enter") {
-                                            props.onCharSelected(item.id);
-                                            focusOnItem(item.nodeRef);
-                                        }
-                                    }}>
-
-                                    <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-                                    <div className="char__name">{item.name}</div>
-                                </li>
-                            </CSSTransition>
-                        )
-                    })}
-                </TransitionGroup>
+                            <img src={item.thumbnail} alt={item.name} style={imgStyle} />
+                            <div className="char__name">{item.name}</div>
+                        </motion.li>
+                    )
+                })}
             </ul>
         )
     }

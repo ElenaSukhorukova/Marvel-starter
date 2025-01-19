@@ -6,13 +6,15 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.0",
+    "formik": "^2.4.6",
+    "motion": "^11.18.1",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.1.2",
     "react-scripts": "^5.0.1",
-    "react-transition-group": "^4.4.5",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "yup": "^1.6.1"
   },
   "scripts": {
     "start": "react-scripts start",
