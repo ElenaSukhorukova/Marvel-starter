@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 import AppBanner from "../appBanner/AppBanner";
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 
-const SingleComicPage = () => {
+const SinglePageLayout = () => {
     return (
         <>
             <AppBanner/>
@@ -14,4 +14,4 @@ const SingleComicPage = () => {
     )
 }
 
-export default SingleComicPage;
+export default SinglePageLayout;

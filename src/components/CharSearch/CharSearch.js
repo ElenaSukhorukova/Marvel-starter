@@ -4,29 +4,41 @@ import { Link } from 'react-router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string } from 'yup';
 
+import useMarvelService from '../../services/MarvelService';
+
 import "./charSearch.scss"
 
-const CharSearch = (props) => {
+const CharSearch = () => {
     const [charId, setCharId] = useState(null);
+
     const [serachClassName, setSearchClassName] = useState("search");
     const [charName, setCharName] = useState(null);
+    const {error, loading, getCharacterByName, clearError} = useMarvelService();
 
-    const findChar = (charNameSearch) => {
+    const onFindChar = (charNameSearch) => {
+        clearError();
+        setCharId(null);
+
         if (!serachClassName.includes('search__increased')) {
             setSearchClassName(serachClassName => `${serachClassName} search__increased`);
         }
 
         setCharName(charNameSearch);
+        getCharacterByName(charNameSearch).then(onLoadedChar);
+    }
 
-        const selectedChar = props.charList.find(function(char) {
-           return char.name.toLowerCase().includes(charNameSearch.toLowerCase());
-        });
-
-        if (selectedChar) {
-            setCharId(selectedChar.id);
-            setCharName(selectedChar.name);
+    const onLoadedChar = (charList) => {
+        if (charList.length > 0) {
+            setCharId(charList[0].id);
+            setCharName(charList[0].name);
         }
     }
+
+    const pending = loading && <div className='error'>Loading...</div>
+    const errorMessage = !loading && (error ? <div className='error'>Something went wrong</div> :
+        (charName && !charId) && (
+            <div className='error'>The character was not found. Check the name and try again</div>
+    ))
 
     return (
         <div className={serachClassName}>
@@ -41,7 +53,7 @@ const CharSearch = (props) => {
                         charName: string().required('This field is required'),
                     })
                 }
-                onSubmit={values => findChar(values.charName)}
+                onSubmit={values => onFindChar(values.charName)}
                 validateOnChange={false}
                 validateOnBlur={false}
             >
@@ -52,18 +64,21 @@ const CharSearch = (props) => {
                         type='text'
                         placeholder="Enter name"
                     />
-                    <button className="button button__main search__button" type='submit'>
+                    <button
+                        className="button button__main search__button"
+                        type='submit'
+                        disabled={loading}
+                    >
                         <div className="inner">find</div>
                     </button>
                     <ErrorMessage className="error" name="charName" component="div" />
                 </Form>
             </Formik>
 
-            {(charName && !charId) && (
-                <div className='error'>The character was not found. Check the name and try again</div>
-            )}
+            {pending}
+            {errorMessage}
 
-            {charId && (
+            {(charId && !loading) && (
                 <div className='success'>
                     <div className='success__text'>There is! Visit {charName} page?</div>
                     <Link

@@ -13,10 +13,18 @@ const useMarvelService = () => {
 		return res.data.results.map(_transformCharacter);
 	}
 
-	const getCharacter = async (id, shortDiscr = true) => {
+	const getCharacter = async (id, shortDescr = true) => {
 		const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
 
-		return _transformCharacter(res.data.results[0], shortDiscr);
+		return _transformCharacter(res.data.results[0], shortDescr);
+	}
+
+	const getCharacterByName = async (name) => {
+		const res = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+
+		console.log('getCharacterByName', res.data.results.map(_transformCharacter));
+
+		return res.data.results.map(_transformCharacter);
 	}
 
 	const getAllComics = async (offset = _baseOffset) => {
@@ -43,11 +51,11 @@ const useMarvelService = () => {
 		}
 	}
 
-	const _transformCharacter = (char, shortDiscr) => {
+	const _transformCharacter = (char, shortDescr = true) => {
 		const modifyDescription = (desc) => {
 			if (desc.length === 0) {
 				return "Description is absent"
-			} else if (shortDiscr && desc.length > 180) {
+			} else if (shortDescr && desc.length > 180) {
 				return `${desc.slice(0, 180)}...`
 			} else {
 				return desc;
@@ -65,7 +73,7 @@ const useMarvelService = () => {
 		}
   }
 
-	return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getSingleComic};
+	return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getSingleComic, getCharacterByName};
 }
 
 export default useMarvelService;

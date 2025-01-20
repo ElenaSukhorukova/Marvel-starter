@@ -7,7 +7,7 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './singleChar.scss';
 
-const SingleChar = (props) => {
+const SingleChar = () => {
     const {charId} = useParams();
     const [char, setCahr] = useState(null);
     const {loading, error, getCharacter, clearError} = useMarvelService();
@@ -19,7 +19,7 @@ const SingleChar = (props) => {
 
     const updateCahr = (id) => {
         clearError();
-        getCharacter(id).then(loadedChar)
+        getCharacter(id, false).then(loadedChar)
     }
 
     const loadedChar = (newChar) => {

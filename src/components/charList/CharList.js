@@ -33,7 +33,6 @@ const CharList = (props) => {
         })
 
         setChars(chars => [...chars, ...newChars]);
-        props.onCharList(newChars);
         setNewItemLoading(false);
         setOffset(offset => offset + 9)
         setCharEnded(newChars.length < 9 ? true : false)
