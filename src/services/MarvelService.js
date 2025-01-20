@@ -13,10 +13,10 @@ const useMarvelService = () => {
 		return res.data.results.map(_transformCharacter);
 	}
 
-	const getCharacter = async (id) => {
+	const getCharacter = async (id, shortDiscr = true) => {
 		const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
 
-		return _transformCharacter(res.data.results[0]);
+		return _transformCharacter(res.data.results[0], shortDiscr);
 	}
 
 	const getAllComics = async (offset = _baseOffset) => {
@@ -43,11 +43,11 @@ const useMarvelService = () => {
 		}
 	}
 
-	const _transformCharacter = (char) => {
+	const _transformCharacter = (char, shortDiscr) => {
 		const modifyDescription = (desc) => {
 			if (desc.length === 0) {
 				return "Description is absent"
-			} else if (desc.length > 180) {
+			} else if (shortDiscr && desc.length > 180) {
 				return `${desc.slice(0, 180)}...`
 			} else {
 				return desc;

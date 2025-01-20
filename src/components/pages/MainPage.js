@@ -10,9 +10,14 @@ import decoration from '../../resources/img/vision.png';
 
 const MainPage = () => {
     const [selectedChar, setChar] = useState(null);
+    const [charList, setCharList] = useState([]);
 
     const onCharSelected = (id) => {
         setChar(id)
+    }
+
+    const onCharList = (chars) => {
+        setCharList(charList => [...charList, ...chars])
     }
 
     return (
@@ -22,20 +27,13 @@ const MainPage = () => {
             </ErrorBoundary>
             <div className="char__content">
                 <ErrorBoundary>
-                    <CharList
-                        onCharSelected={onCharSelected}
-                        render={chars => (
-                            <CharSearch
-                                chars={chars}
-                                onCharSelected={onCharSelected}
-                            />
-                        )}
-                    />
+                    <CharList onCharSelected={onCharSelected} onCharList={onCharList} />
                 </ErrorBoundary>
                 <ErrorBoundary>
-                    <CharInfo charId={selectedChar} />
+                    <CharInfo charId={selectedChar}>
+                        <CharSearch charList={charList} />
+                    </CharInfo>
                 </ErrorBoundary>
-
             </div>
             <img className="bg-decoration" src={decoration} alt="vision"/>
         </>

@@ -1,13 +1,41 @@
 @import '../../style/variables';
 
 .search {
-    position: absolute;
+    position: relative;
     width: 425px;
     height: 127px;
-    right: 0px;
-    bottom: 157px;
+    margin-top: 20px;
     background: #FFFFFF;
     box-shadow: 0px 0px 20px 0px #00000040;
+
+    &__increased {
+        min-height: 200px;
+
+        .error {
+            margin: 8px 0 0 23px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            color: $main-color;
+        }
+        .success {
+            width: 100%;
+
+            &__text {
+                width: 250px;
+                margin: 18px 0 0 23px;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: left;
+                color: $green;
+            }
+            &__button {
+                position: absolute;
+                top: 115px;
+                right: 28px;
+            }
+        }
+    }
 
     &__header {
         font-weight: bold;
@@ -17,35 +45,27 @@
         margin-left: 24px;
     }
 
-    &__form {
-        input {
-            font-size: 14px;
-            font-weight: 400;
-            text-align: left;
-            padding-left: 10px;
-            color: $grey;
-            width: 250px;
-            height: 38px;
-            border: none;
-            margin-left: 24px;
-            margin-top: 15px;
-            background: #FFFFFF;
-            box-shadow: 0px 4px 4px 0px #00000040;
-            &:focus {
-                outline: 1px solid $main-color;
-            }
+    input {
+        font-size: 14px;
+        font-weight: 400;
+        text-align: left;
+        padding-left: 10px;
+        color: $grey;
+        width: 250px;
+        height: 38px;
+        border: none;
+        margin-left: 24px;
+        margin-top: 15px;
+        background: #FFFFFF;
+        box-shadow: 0px 4px 4px 0px #00000040;
+        &:focus {
+            outline: 1px solid $main-color;
         }
+    }
 
-        .button__long {
-            display: inline;
-            width: 101px;
-            height: 38px;
-            margin-top: 15px;
-            margin-left: 24px;
-        }
-        .error {
-            color: $main-color;
-            margin-top: 8px;
-        }
+    &__button {
+        display: inline;
+        margin-top: 15px;
+        margin-left: 24px;
     }
 }

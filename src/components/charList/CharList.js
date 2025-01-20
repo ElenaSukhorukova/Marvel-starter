@@ -1,4 +1,4 @@
-import { useState, useEffect, createRef, Children } from 'react';
+import { useState, useEffect, createRef } from 'react';
 import PropTypes from 'prop-types';
 import { motion } from "motion/react";
 
@@ -33,6 +33,7 @@ const CharList = (props) => {
         })
 
         setChars(chars => [...chars, ...newChars]);
+        props.onCharList(newChars);
         setNewItemLoading(false);
         setOffset(offset => offset + 9)
         setCharEnded(newChars.length < 9 ? true : false)
@@ -90,7 +91,6 @@ const CharList = (props) => {
             {errorMessage}
             {spinner}
             {items}
-            {props.render(chars)}
 
             <button className="button button__main button__long"
                     disabled={newItemLoading}

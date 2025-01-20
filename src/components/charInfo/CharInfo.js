@@ -10,7 +10,7 @@ import Skeleton from '../skeleton/Skeleton';
 
 import './charInfo.scss';
 
-const CharInfo = ( {charId} ) => {
+const CharInfo = ( {charId, children} ) => {
     const [char, setChar] = useState(null);
     const {loading, error, getCharacter, clearError} = useMarvelService();
 
@@ -36,16 +36,19 @@ const CharInfo = ( {charId} ) => {
     const content = !(loading || error || !char) ? <View char={char} /> : null;
 
     return (
-        <div className="char__info">
-            {skeleton}
-            {errorMessage}
-            {spinner}
-            {content}
+        <div className='char__info-block'>
+            <div className="char__info">
+                {skeleton}
+                {errorMessage}
+                {spinner}
+                {content}
+            </div>
+            {children}
         </div>
     )
 }
 
-const View = ({char}) => {
+const View = ({char, search}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char
     const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
 

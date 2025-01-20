@@ -8,7 +8,9 @@ import "./mainContent.scss";
 const Page404 = lazy(() => import("../pages/404"));
 const MainPage = lazy(() => import("../pages/MainPage"));
 const ComicsPage = lazy(() => import("../pages/ComicsPage"));
-const SingleComicPage = lazy(() => import("../pages/SingleComicPage"));
+const SinglePageLayout = lazy(() => import("../pages/SinglePageLayout"));
+const SingleComic = lazy(() => import("../singleComic/SingleComic"));
+const SingleChar = lazy(() => import("../singleChar/SingleChar"));
 
 const MainContent = () => {
   const location = useLocation();
@@ -33,7 +35,10 @@ const MainContent = () => {
               <Routes location={displayLocation}>
                   <Route path="/" element={<MainPage />} />
                   <Route path="/comics" element={<ComicsPage />} />
-                  <Route path="/comics/:comicId" element={<SingleComicPage />} />
+                  <Route element={<SinglePageLayout />}>
+                    <Route path="/comics/:comicId" element={<SingleComic />} />
+                    <Route path="/chars/:charId" element={<SingleChar />} />
+                  </Route>
                   <Route path="*" element={<Page404 />} />
               </Routes>
           </Suspense>

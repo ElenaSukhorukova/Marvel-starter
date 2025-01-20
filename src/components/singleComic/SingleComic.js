@@ -40,11 +40,9 @@ const SingleComic = () => {
 
 const View = ({comic}) => {
     const {title, description, pages, price, thumbnail} = comic
-    const imgStyle = thumbnail.includes("image_not_available") ? {objectFit: 'fill'} : null
-
     return (
         <>
-         <img src={thumbnail} alt={title} className="single-comic__img" style={imgStyle}/>
+         <img src={thumbnail} alt={title} className="single-comic__img" />
             <div className="single-comic__info">
                 <h2 className="single-comic__name">{title}</h2>
                 <p className="single-comic__descr">{description}</p>
