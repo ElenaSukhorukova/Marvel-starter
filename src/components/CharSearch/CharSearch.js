@@ -8,37 +8,49 @@ import useMarvelService from '../../services/MarvelService';
 
 import "./charSearch.scss"
 
+const setContent = (process, Component, props) => {
+    switch (process) {
+        case 'waiting':
+            return null
+        case 'loading':
+            return <div className='error'>Loading...</div>
+        case 'confirmed':
+            return <Component {...props} />
+        case 'error':
+            return <div className='error'>Something went wrong</div>
+        case 'notFound':
+                return <div className='error'>The character was not found. Check the name and try again</div>
+        default:
+            throw new Error('Unexpected process state')
+    }
+}
+
 const CharSearch = () => {
     const [charId, setCharId] = useState(null);
-
     const [serachClassName, setSearchClassName] = useState("search");
     const [charName, setCharName] = useState(null);
-    const {error, loading, getCharacterByName, clearError} = useMarvelService();
+    const {getCharacterByName, clearError, process, setProcess} = useMarvelService();
 
     const onFindChar = (charNameSearch) => {
         clearError();
-        setCharId(null);
 
         if (!serachClassName.includes('search__increased')) {
             setSearchClassName(serachClassName => `${serachClassName} search__increased`);
         }
 
-        setCharName(charNameSearch);
-        getCharacterByName(charNameSearch).then(onLoadedChar);
+        getCharacterByName(charNameSearch)
+            .then(onLoadedChar);
     }
 
     const onLoadedChar = (charList) => {
         if (charList.length > 0) {
             setCharId(charList[0].id);
             setCharName(charList[0].name);
+            setProcess('confirmed');
+        } else {
+            setProcess('notFound');
         }
     }
-
-    const pending = loading && <div className='error'>Loading...</div>
-    const errorMessage = !loading && (error ? <div className='error'>Something went wrong</div> :
-        (charName && !charId) && (
-            <div className='error'>The character was not found. Check the name and try again</div>
-    ))
 
     return (
         <div className={serachClassName}>
@@ -67,7 +79,7 @@ const CharSearch = () => {
                     <button
                         className="button button__main search__button"
                         type='submit'
-                        disabled={loading}
+                        disabled={process === 'loading'}
                     >
                         <div className="inner">find</div>
                     </button>
@@ -75,23 +87,24 @@ const CharSearch = () => {
                 </Form>
             </Formik>
 
-            {pending}
-            {errorMessage}
-
-            {(charId && !loading) && (
-                <div className='success'>
-                    <div className='success__text'>There is! Visit {charName} page?</div>
-                    <Link
-                        to={`/chars/${charId}`}
-                        className="button button__secondary success__button"
-                        type='button'
-                    >
-                        <div className="inner">TO PAGE</div>
-                    </Link>
-                </div>
-            )}
+            {setContent(process, View, {charId, charName})}
         </div>
     )
+}
+
+const View = ({charId, charName}) => {
+    return (
+        <div className='success'>
+          <div className='success__text'>There is! Visit {charName} page?</div>
+          <Link
+              to={`/chars/${charId}`}
+              className="button button__secondary success__button"
+              type='button'
+          >
+              <div className="inner">TO PAGE</div>
+          </Link>
+      </div>
+    );
 }
 
 export default CharSearch;

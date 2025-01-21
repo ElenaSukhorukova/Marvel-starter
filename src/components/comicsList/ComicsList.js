@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setListContent from '../../utils/setListContent';
 
 import './comicsList.scss';
 
 const ComicsList = () => {
-    const {loading, error, getAllComics} = useMarvelService();
+    const {getAllComics, process, setProcess} = useMarvelService();
 
     const [comicsList, setComicsList] = useState([]);
     const [offset, setOffset] = useState(210);
@@ -17,11 +16,15 @@ const ComicsList = () => {
 
     useEffect(() => {
         onRequest(offset, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const onRequest = (offset, initial) => {
         setNewLoading(initial ? false : true);
-        getAllComics(offset).then(loadedComics);
+
+        getAllComics(offset)
+            .then(loadedComics)
+            .then(() => setProcess('confirmed'));
     }
 
     const loadedComics = (newComics) => {
@@ -54,15 +57,9 @@ const ComicsList = () => {
         )
     }
 
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newLoading ? <Spinner /> : null;
-    const content = renderComics(comicsList)
-
     return (
         <div className="comics__list">
-            {errorMessage}
-            {spinner}
-            {content}
+            {setListContent(process, () => renderComics(comicsList), newLoading)}
 
             <button
                 className="button button__main button__long"

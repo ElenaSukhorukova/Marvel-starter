@@ -3,15 +3,14 @@ import { useParams, Link } from 'react-router';
 import { Helmet } from 'react-helmet';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import './singleChar.scss';
 
 const SingleChar = () => {
     const {charId} = useParams();
     const [char, setCahr] = useState(null);
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
 
     useEffect(() => {
@@ -20,22 +19,18 @@ const SingleChar = () => {
 
     const updateCahr = (id) => {
         clearError();
-        getCharacter(id, false).then(loadedChar)
+        getCharacter(id, false)
+            .then(loadedChar)
+            .then(() => setProcess('confirmed'));
     }
 
     const loadedChar = (newChar) => {
         setCahr(newChar);
     }
 
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(error || loading) && char ? <View char={char} /> : null
-
     return (
         <div className="single-char">
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, View, {char})}
         </div>
     )
 }

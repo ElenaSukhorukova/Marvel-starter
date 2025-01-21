@@ -1,15 +1,14 @@
-import { useState, useEffect, createRef } from 'react';
+import { useState, useEffect, createRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { motion } from "motion/react";
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setListContent from '../../utils/setListContent';
 
 import './charList.scss';
 
 const CharList = (props) => {
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
     const [chars, setChars] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
@@ -17,12 +16,15 @@ const CharList = (props) => {
 
     useEffect(() => {
         onRequest(offset, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onRequest = (offset, initial) => {
         setNewItemLoading(initial ? false : true);
 
-        getAllCharacters(offset).then(onCharLoaded);
+        getAllCharacters(offset)
+            .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onCharLoaded = async (newChars) => {
@@ -46,7 +48,7 @@ const CharList = (props) => {
         ref.current.focus();
     }
 
-    function renderItems(arr) {
+    function renderItems(arr){
         return (
             <ul className="char__grid">
                 {arr.map((item) => {
@@ -70,8 +72,7 @@ const CharList = (props) => {
                                     props.onCharSelected(item.id);
                                     focusOnItem(item.nodeRef);
                                 }
-                            }}>
-
+                        }}>
                             <img src={item.thumbnail} alt={item.name} style={imgStyle} />
                             <div className="char__name">{item.name}</div>
                         </motion.li>
@@ -81,15 +82,14 @@ const CharList = (props) => {
         )
     }
 
-    const items = renderItems(chars);
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newItemLoading ? <Spinner /> : null;
+    const elements = useMemo(() => {
+        return setListContent(process, () => renderItems(chars), newItemLoading)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chars]);
 
     return (
         <div className="char__list">
-            {errorMessage}
-            {spinner}
-            {items}
+            {elements}
 
             <button className="button button__main button__long"
                     disabled={newItemLoading}
@@ -100,6 +100,7 @@ const CharList = (props) => {
         </div>
     );
 }
+
 
 CharList.propTypes = {
     onCharSelected: PropTypes.func.isRequired
